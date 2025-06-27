@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         body {
             margin: 0;
@@ -17,6 +16,29 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        
+        /* Lucide icons as CSS */
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+        
+        .chevron-down::before { content: "⌄"; font-size: 20px; }
+        .chevron-right::before { content: "›"; font-size: 20px; }
+        .baby::before { content: "👶"; font-size: 20px; }
+        .moon::before { content: "🌙"; font-size: 16px; }
+        .utensils::before { content: "🍼"; font-size: 16px; }
+        .refresh::before { content: "🔄"; font-size: 16px; }
+        .heart::before { content: "❤️"; font-size: 16px; }
+        .users::before { content: "👥"; font-size: 16px; }
+        .alert::before { content: "⚠️"; font-size: 16px; }
+        .clock::before { content: "🕐"; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -24,7 +46,6 @@
     
     <script type="text/babel">
         const { useState } = React;
-        const { ChevronDown, ChevronRight, Baby, Moon, Utensils, RefreshCw, Heart, Users, AlertCircle, Clock } = lucide;
 
         const NewbornCareApp = () => {
           const [activeSection, setActiveSection] = useState('feeding');
@@ -40,7 +61,7 @@
           const sections = {
             feeding: {
               title: 'Feeding Your Baby',
-              icon: React.createElement(Utensils, { className: "w-5 h-5" }),
+              icon: '🍼',
               color: 'bg-blue-500',
               tips: [
                 {
@@ -71,7 +92,7 @@
             },
             nappies: {
               title: 'Nappy Changes',
-              icon: React.createElement(RefreshCw, { className: "w-5 h-5" }),
+              icon: '🔄',
               color: 'bg-green-500',
               tips: [
                 {
@@ -102,7 +123,7 @@
             },
             sleep: {
               title: 'Sleep & Settling',
-              icon: React.createElement(Moon, { className: "w-5 h-5" }),
+              icon: '🌙',
               color: 'bg-purple-500',
               tips: [
                 {
@@ -133,7 +154,7 @@
             },
             health: {
               title: 'Health & Development',
-              icon: React.createElement(Heart, { className: "w-5 h-5" }),
+              icon: '❤️',
               color: 'bg-red-500',
               tips: [
                 {
@@ -164,7 +185,7 @@
             },
             partners: {
               title: 'Partner Support',
-              icon: React.createElement(Users, { className: "w-5 h-5" }),
+              icon: '👥',
               color: 'bg-orange-500',
               tips: [
                 {
@@ -195,7 +216,7 @@
             },
             routine: {
               title: 'Daily Routine',
-              icon: React.createElement(Clock, { className: "w-5 h-5" }),
+              icon: '🕐',
               color: 'bg-teal-500',
               tips: [
                 {
@@ -226,95 +247,98 @@
             }
           };
 
-          return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" },
-            React.createElement('div', { className: "max-w-4xl mx-auto p-4" },
-              // Header
-              React.createElement('div', { className: "text-center mb-8 bg-white rounded-xl shadow-lg p-6" },
-                React.createElement('div', { className: "flex items-center justify-center mb-4" },
-                  React.createElement(Baby, { className: "w-8 h-8 text-blue-600 mr-3" }),
-                  React.createElement('h1', { className: "text-3xl font-bold text-gray-800" }, "NHS Newborn Care Guide")
-                ),
-                React.createElement('p', { className: "text-gray-600 text-lg" }, "Essential care information for your baby's first weeks"),
-                React.createElement('div', { className: "mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500" },
-                  React.createElement('div', { className: "flex items-center" },
-                    React.createElement(AlertCircle, { className: "w-5 h-5 text-blue-600 mr-2" }),
-                    React.createElement('p', { className: "text-sm text-blue-800" },
-                      React.createElement('strong', null, "Emergency:"),
-                      " Call 999 or go to A&E if your baby has difficulty breathing, won't wake up, or you're very worried"
-                    )
-                  )
-                )
-              ),
-              
-              // Navigation
-              React.createElement('div', { className: "mb-6" },
-                React.createElement('div', { className: "flex flex-wrap gap-2 justify-center" },
-                  Object.entries(sections).map(([key, section]) =>
-                    React.createElement('button', {
-                      key: key,
-                      onClick: () => setActiveSection(key),
-                      className: `flex items-center px-4 py-2 rounded-lg transition-all ${
-                        activeSection === key
-                          ? `${section.color} text-white shadow-lg`
-                          : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`
-                    },
-                      section.icon,
-                      React.createElement('span', { className: "ml-2 font-medium" }, section.title)
-                    )
-                  )
-                )
-              ),
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+              <div className="max-w-4xl mx-auto p-4">
+                {/* Header */}
+                <div className="text-center mb-8 bg-white rounded-xl shadow-lg p-6">
+                  <div className="flex items-center justify-center mb-4">
+                    <span className="text-3xl mr-3">👶</span>
+                    <h1 className="text-3xl font-bold text-gray-800">NHS Newborn Care Guide</h1>
+                  </div>
+                  <p className="text-gray-600 text-lg">Essential care information for your baby's first weeks</p>
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                    <div className="flex items-center">
+                      <span className="text-lg mr-2">⚠️</span>
+                      <p className="text-sm text-blue-800">
+                        <strong>Emergency:</strong> Call 999 or go to A&E if your baby has difficulty breathing, won't wake up, or you're very worried
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Navigation */}
+                <div className="mb-6">
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {Object.entries(sections).map(([key, section]) => (
+                      <button
+                        key={key}
+                        onClick={() => setActiveSection(key)}
+                        className={`flex items-center px-4 py-2 rounded-lg transition-all ${
+                          activeSection === key
+                            ? `${section.color} text-white shadow-lg`
+                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="mr-2">{section.icon}</span>
+                        <span className="font-medium">{section.title}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              // Content
-              React.createElement('div', { className: "bg-white rounded-xl shadow-lg p-6" },
-                React.createElement('h2', { className: "text-2xl font-bold text-gray-800 mb-6 flex items-center" },
-                  sections[activeSection].icon,
-                  React.createElement('span', { className: "ml-3" }, sections[activeSection].title)
-                ),
+                {/* Content */}
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span className="text-2xl mr-3">{sections[activeSection].icon}</span>
+                    <span>{sections[activeSection].title}</span>
+                  </h2>
 
-                React.createElement('div', { className: "space-y-4" },
-                  sections[activeSection].tips.map((tip) =>
-                    React.createElement('div', { key: tip.id, className: "border border-gray-200 rounded-lg overflow-hidden" },
-                      React.createElement('button', {
-                        onClick: () => toggleTip(tip.id),
-                        className: "w-full p-4 text-left hover:bg-gray-50 transition-colors"
-                      },
-                        React.createElement('div', { className: "flex items-center justify-between" },
-                          React.createElement('div', null,
-                            React.createElement('h3', { className: "font-semibold text-gray-800 text-lg" }, tip.title),
-                            React.createElement('p', { className: "text-gray-600 mt-1" }, tip.quick)
-                          ),
-                          expandedTips[tip.id] ?
-                            React.createElement(ChevronDown, { className: "w-5 h-5 text-gray-500" }) :
-                            React.createElement(ChevronRight, { className: "w-5 h-5 text-gray-500" })
-                        )
-                      ),
-                      
-                      expandedTips[tip.id] && React.createElement('div', { className: "px-4 pb-4 bg-gray-50 border-t border-gray-200" },
-                        React.createElement('p', { className: "text-gray-700 leading-relaxed" }, tip.details)
-                      )
-                    )
-                  )
-                )
-              ),
+                  <div className="space-y-4">
+                    {sections[activeSection].tips.map((tip) => (
+                      <div key={tip.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => toggleTip(tip.id)}
+                          className="w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="font-semibold text-gray-800 text-lg">{tip.title}</h3>
+                              <p className="text-gray-600 mt-1">{tip.quick}</p>
+                            </div>
+                            <span className="text-xl text-gray-500">
+                              {expandedTips[tip.id] ? '⌄' : '›'}
+                            </span>
+                          </div>
+                        </button>
+                        
+                        {expandedTips[tip.id] && (
+                          <div className="px-4 pb-4 bg-gray-50 border-t border-gray-200">
+                            <p className="text-gray-700 leading-relaxed">{tip.details}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-              // Footer
-              React.createElement('div', { className: "mt-8 text-center" },
-                React.createElement('div', { className: "bg-white rounded-lg shadow p-4" },
-                  React.createElement('p', { className: "text-sm text-gray-600" },
-                    "This information is based on NHS guidelines. Always consult your midwife, health visitor, or GP for personalised advice."
-                  ),
-                  React.createElement('p', { className: "text-xs text-gray-500 mt-2" },
-                    "For urgent concerns outside surgery hours, call NHS 111"
-                  )
-                )
-              )
-            )
+                {/* Footer */}
+                <div className="mt-8 text-center">
+                  <div className="bg-white rounded-lg shadow p-4">
+                    <p className="text-sm text-gray-600">
+                      This information is based on NHS guidelines. Always consult your midwife, health visitor, or GP for personalised advice.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      For urgent concerns outside surgery hours, call NHS 111
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           );
         };
 
-        ReactDOM.render(React.createElement(NewbornCareApp), document.getElementById('root'));
+        ReactDOM.render(<NewbornCareApp />, document.getElementById('root'));
     </script>
 </body>
 </html>
