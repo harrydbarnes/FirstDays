@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHS Newborn Care Guide</title>
+    <meta name="description" content="NHS-backed newborn care guide with essential information for new parents from day zero onwards">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+        const { ChevronDown, ChevronRight, Baby, Moon, Utensils, RefreshCw, Heart, Users, AlertCircle, Clock } = lucide;
+
+        const NewbornCareApp = () => {
+          const [activeSection, setActiveSection] = useState('feeding');
+          const [expandedTips, setExpandedTips] = useState({});
+
+          const toggleTip = (tipId) => {
+            setExpandedTips(prev => ({
+              ...prev,
+              [tipId]: !prev[tipId]
+            }));
+          };
+
+          const sections = {
+            feeding: {
+              title: 'Feeding Your Baby',
+              icon: React.createElement(Utensils, { className: "w-5 h-5" }),
+              color: 'bg-blue-500',
+              tips: [
+                {
+                  id: 'breastfeeding-basics',
+                  title: 'Breastfeeding Basics',
+                  quick: 'Feed 8-12 times per day, let baby lead',
+                  details: 'Newborns feed frequently - every 2-3 hours. Look for hunger cues: rooting, sucking motions, fussiness. A good latch covers most of the areola, not just the nipple. Feed until baby naturally releases or falls asleep.'
+                },
+                {
+                  id: 'bottle-feeding',
+                  title: 'Bottle Feeding',
+                  quick: '60-90ml every 2-4 hours initially',
+                  details: 'Start with small amounts (30-60ml) and increase gradually. Hold baby semi-upright, let them control the pace. Wind halfway through and after feeding. Sterilise equipment for first 12 months.'
+                },
+                {
+                  id: 'mixed-feeding',
+                  title: 'Combined Feeding',
+                  quick: 'Establish breastfeeding first, then introduce bottles',
+                  details: 'Wait 3-4 weeks before introducing bottles if breastfeeding. Use paced bottle feeding technique. Store expressed milk safely: room temperature 6 hours, fridge 5 days, freezer 6 months.'
+                },
+                {
+                  id: 'feeding-cues',
+                  title: 'Recognising Hunger & Fullness',
+                  quick: 'Early cues: rooting, sucking. Late: crying',
+                  details: 'Hunger signs: lip smacking, rooting, bringing hands to mouth, restlessness. Fullness signs: turning head away, pushing bottle away, relaxed hands, falling asleep.'
+                }
+              ]
+            },
+            nappies: {
+              title: 'Nappy Changes',
+              icon: React.createElement(RefreshCw, { className: "w-5 h-5" }),
+              color: 'bg-green-500',
+              tips: [
+                {
+                  id: 'changing-basics',
+                  title: 'Safe Nappy Changing',
+                  quick: 'Change every 2-3 hours and after each poo',
+                  details: 'Always keep one hand on baby. Clean front to back with warm water or fragrance-free wipes. Let area air dry before new nappy. Apply barrier cream if needed.'
+                },
+                {
+                  id: 'nappy-contents',
+                  title: 'What to Expect',
+                  quick: 'First poo (meconium) is dark, then changes colour',
+                  details: 'Day 1-3: Dark green/black meconium. Day 4+: Yellow/mustard (breastfed) or pale yellow/brown (formula). Wet nappies: 1 on day 1, increasing to 6+ by day 6.'
+                },
+                {
+                  id: 'nappy-rash',
+                  title: 'Preventing Nappy Rash',
+                  quick: 'Change frequently, clean gently, air dry',
+                  details: 'Change wet/soiled nappies promptly. Use plain water for cleaning newborns. Pat dry, don\'t rub. Leave nappy off for short periods. Use barrier cream sparingly.'
+                },
+                {
+                  id: 'supplies',
+                  title: 'Essential Supplies',
+                  quick: 'Nappies, wipes, barrier cream, changing mat',
+                  details: 'Keep supplies within reach but away from baby. Have spare clothes ready. Use a waterproof changing mat. Keep nappy sacks or bin nearby.'
+                }
+              ]
+            },
+            sleep: {
+              title: 'Sleep & Settling',
+              icon: React.createElement(Moon, { className: "w-5 h-5" }),
+              color: 'bg-purple-500',
+              tips: [
+                {
+                  id: 'safe-sleep',
+                  title: 'Safe Sleep Guidelines',
+                  quick: 'Back to sleep, clear cot, room temperature 16-20°C',
+                  details: 'Always place baby on their back. Use a firm mattress with fitted sheets. No loose bedding, pillows, or toys. Baby should sleep in your room for first 6 months.'
+                },
+                {
+                  id: 'sleep-patterns',
+                  title: 'Newborn Sleep Patterns',
+                  quick: '14-17 hours total, in 2-4 hour stretches',
+                  details: 'Newborns sleep most of the day but wake frequently for feeds. Sleep cycles are shorter than adults. Day/night confusion is normal - establish routines gradually.'
+                },
+                {
+                  id: 'settling-techniques',
+                  title: 'Settling Your Baby',
+                  quick: 'Swaddle, shush, swing, suck, side position',
+                  details: 'Try the 5 S\'s: Swaddle snugly, Shush loudly, Swing gently, offer Suck (dummy/finger), hold on Side. Not all work for every baby - find what works for yours.'
+                },
+                {
+                  id: 'partner-support',
+                  title: 'Taking Turns',
+                  quick: 'Share night duties, plan sleep shifts',
+                  details: 'Take turns with night feeds. If breastfeeding, partner can do nappy changes and settling. Consider expressing milk for night feeds. Rest when baby rests during the day.'
+                }
+              ]
+            },
+            health: {
+              title: 'Health & Development',
+              icon: React.createElement(Heart, { className: "w-5 h-5" }),
+              color: 'bg-red-500',
+              tips: [
+                {
+                  id: 'weight-growth',
+                  title: 'Weight & Growth',
+                  quick: 'Weight loss up to 10% normal, should regain by day 10',
+                  details: 'Most babies lose 5-10% of birth weight in first few days. Should regain birth weight by 10-14 days. Regular weighing not needed unless concerns. Growth spurts common at 2-3 weeks, 6 weeks, 3 months.'
+                },
+                {
+                  id: 'umbilical-care',
+                  title: 'Umbilical Cord Care',
+                  quick: 'Keep clean and dry, falls off in 1-3 weeks',
+                  details: 'Clean with plain water if soiled. Keep dry and exposed to air. Fold nappy below cord. Normal for small amount of blood when it falls off. See GP if red, swollen, or smelly.'
+                },
+                {
+                  id: 'jaundice',
+                  title: 'Newborn Jaundice',
+                  quick: 'Common after day 2, monitor yellow colouring',
+                  details: 'Affects over half of newborns. Usually appears day 2-3, peaks day 4-5. Check in natural light - press skin gently, look for yellow tinge. Contact midwife if concerned or if yellowing spreads.'
+                },
+                {
+                  id: 'when-to-worry',
+                  title: 'When to Seek Help',
+                  quick: 'Difficulty breathing, poor feeding, unusual behaviour',
+                  details: 'Contact healthcare immediately for: difficulty breathing, blue lips/tongue, very hot/cold, unusually floppy, persistent vomiting, fewer than 6 wet nappies after day 5, seems unwell.'
+                }
+              ]
+            },
+            partners: {
+              title: 'Partner Support',
+              icon: React.createElement(Users, { className: "w-5 h-5" }),
+              color: 'bg-orange-500',
+              tips: [
+                {
+                  id: 'sharing-duties',
+                  title: 'Sharing Care Duties',
+                  quick: 'Divide tasks, support each other, communicate needs',
+                  details: 'Non-breastfeeding partner: nappy changes, baths, settling, housework. Take turns with night duties. Communicate openly about needs and feelings. Both parents learn all care tasks.'
+                },
+                {
+                  id: 'supporting-breastfeeding',
+                  title: 'Supporting Breastfeeding',
+                  quick: 'Bring baby for feeds, help with positioning, emotional support',
+                  details: 'Fetch baby for night feeds, help with positioning/latching, bring snacks and water, take over after feeds for winding and settling. Offer encouragement and practical support.'
+                },
+                {
+                  id: 'rest-recovery',
+                  title: 'Rest & Recovery',
+                  quick: 'Sleep when baby sleeps, accept help, rest in shifts',
+                  details: 'Both parents need rest. Sleep when baby sleeps during day. Take turns for longer sleep stretches at night. Accept help from family/friends. Limit visitors initially.'
+                },
+                {
+                  id: 'emotional-support',
+                  title: 'Emotional Wellbeing',
+                  quick: 'Talk openly, seek support, be patient with yourselves',
+                  details: 'Baby blues are normal in first 2 weeks. Talk about your feelings. Seek help if sadness persists or affects daily life. Be patient - you\'re both learning. Celebrate small victories.'
+                }
+              ]
+            },
+            routine: {
+              title: 'Daily Routine',
+              icon: React.createElement(Clock, { className: "w-5 h-5" }),
+              color: 'bg-teal-500',
+              tips: [
+                {
+                  id: 'flexible-routine',
+                  title: 'Building a Flexible Routine',
+                  quick: 'Follow baby\'s natural patterns, establish gentle rhythms',
+                  details: 'Newborns don\'t follow strict schedules. Watch for baby\'s natural patterns. Create gentle rhythms: feed, awake time, sleep. Routines develop gradually over weeks and months.'
+                },
+                {
+                  id: 'daily-care',
+                  title: 'Daily Care Tasks',
+                  quick: 'Feeds, nappy changes, brief awake periods, lots of sleep',
+                  details: 'Typical day: 8-12 feeds, 8-10 nappy changes, short awake periods after feeds, 14-17 hours sleep total. Don\'t expect predictability in first weeks.'
+                },
+                {
+                  id: 'bath-time',
+                  title: 'Bathing Your Baby',
+                  quick: '2-3 times per week, 37°C water, 5-10 minutes',
+                  details: 'Daily baths not needed. Use baby bath or clean basin. Water depth 5cm, temperature 37°C. Support head and neck. Wash face first, hair last. Have towel ready.'
+                },
+                {
+                  id: 'awake-time',
+                  title: 'Awake & Alert Time',
+                  quick: 'Short periods initially, increase gradually',
+                  details: 'Newborns have very short awake periods - often just for feeds initially. Gradually increases to 45-60 minutes by 2 months. Use for gentle interaction, tummy time (when awake and supervised).'
+                }
+              ]
+            }
+          };
+
+          return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" },
+            React.createElement('div', { className: "max-w-4xl mx-auto p-4" },
+              // Header
+              React.createElement('div', { className: "text-center mb-8 bg-white rounded-xl shadow-lg p-6" },
+                React.createElement('div', { className: "flex items-center justify-center mb-4" },
+                  React.createElement(Baby, { className: "w-8 h-8 text-blue-600 mr-3" }),
+                  React.createElement('h1', { className: "text-3xl font-bold text-gray-800" }, "NHS Newborn Care Guide")
+                ),
+                React.createElement('p', { className: "text-gray-600 text-lg" }, "Essential care information for your baby's first weeks"),
+                React.createElement('div', { className: "mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500" },
+                  React.createElement('div', { className: "flex items-center" },
+                    React.createElement(AlertCircle, { className: "w-5 h-5 text-blue-600 mr-2" }),
+                    React.createElement('p', { className: "text-sm text-blue-800" },
+                      React.createElement('strong', null, "Emergency:"),
+                      " Call 999 or go to A&E if your baby has difficulty breathing, won't wake up, or you're very worried"
+                    )
+                  )
+                )
+              ),
+              
+              // Navigation
+              React.createElement('div', { className: "mb-6" },
+                React.createElement('div', { className: "flex flex-wrap gap-2 justify-center" },
+                  Object.entries(sections).map(([key, section]) =>
+                    React.createElement('button', {
+                      key: key,
+                      onClick: () => setActiveSection(key),
+                      className: `flex items-center px-4 py-2 rounded-lg transition-all ${
+                        activeSection === key
+                          ? `${section.color} text-white shadow-lg`
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`
+                    },
+                      section.icon,
+                      React.createElement('span', { className: "ml-2 font-medium" }, section.title)
+                    )
+                  )
+                )
+              ),
+
+              // Content
+              React.createElement('div', { className: "bg-white rounded-xl shadow-lg p-6" },
+                React.createElement('h2', { className: "text-2xl font-bold text-gray-800 mb-6 flex items-center" },
+                  sections[activeSection].icon,
+                  React.createElement('span', { className: "ml-3" }, sections[activeSection].title)
+                ),
+
+                React.createElement('div', { className: "space-y-4" },
+                  sections[activeSection].tips.map((tip) =>
+                    React.createElement('div', { key: tip.id, className: "border border-gray-200 rounded-lg overflow-hidden" },
+                      React.createElement('button', {
+                        onClick: () => toggleTip(tip.id),
+                        className: "w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                      },
+                        React.createElement('div', { className: "flex items-center justify-between" },
+                          React.createElement('div', null,
+                            React.createElement('h3', { className: "font-semibold text-gray-800 text-lg" }, tip.title),
+                            React.createElement('p', { className: "text-gray-600 mt-1" }, tip.quick)
+                          ),
+                          expandedTips[tip.id] ?
+                            React.createElement(ChevronDown, { className: "w-5 h-5 text-gray-500" }) :
+                            React.createElement(ChevronRight, { className: "w-5 h-5 text-gray-500" })
+                        )
+                      ),
+                      
+                      expandedTips[tip.id] && React.createElement('div', { className: "px-4 pb-4 bg-gray-50 border-t border-gray-200" },
+                        React.createElement('p', { className: "text-gray-700 leading-relaxed" }, tip.details)
+                      )
+                    )
+                  )
+                )
+              ),
+
+              // Footer
+              React.createElement('div', { className: "mt-8 text-center" },
+                React.createElement('div', { className: "bg-white rounded-lg shadow p-4" },
+                  React.createElement('p', { className: "text-sm text-gray-600" },
+                    "This information is based on NHS guidelines. Always consult your midwife, health visitor, or GP for personalised advice."
+                  ),
+                  React.createElement('p', { className: "text-xs text-gray-500 mt-2" },
+                    "For urgent concerns outside surgery hours, call NHS 111"
+                  )
+                )
+              )
+            )
+          );
+        };
+
+        ReactDOM.render(React.createElement(NewbornCareApp), document.getElementById('root'));
+    </script>
+</body>
+</html>
