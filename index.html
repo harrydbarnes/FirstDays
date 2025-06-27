@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NHS Newborn Care Guide</title>
-    <meta name="description" content="NHS-backed newborn care guide with essential information for new parents from day zero onwards">
+    <title>First Days: Newborn Care Guide</title>
+    <meta name="description" content="Essential newborn care guide for new parents, covering the first days and beyond. UK-focused advice.">
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -45,11 +45,17 @@
     <div id="root"></div>
     
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
         const NewbornCareApp = () => {
           const [activeSection, setActiveSection] = useState('feeding');
           const [expandedTips, setExpandedTips] = useState({});
+          const [showEmergency, setShowEmergency] = useState(false);
+          const [pageBackground, setPageBackground] = useState('bg-gradient-to-br from-slate-50 to-gray-100'); // Default background
+          const [greeting, setGreeting] = useState('');
+          const [weather, setWeather] = useState(null);
+          const [weatherLoading, setWeatherLoading] = useState(true);
+          const [weatherError, setWeatherError] = useState(null);
 
           const toggleTip = (tipId) => {
             setExpandedTips(prev => ({
@@ -58,34 +64,35 @@
             }));
           };
 
-          const sections = {
+          const sectionDetails = {
             feeding: {
               title: 'Feeding Your Baby',
               icon: '🍼',
-              color: 'bg-blue-500',
+              baseColor: 'bg-blue-500',
+              lightColor: 'bg-blue-50',
               tips: [
                 {
                   id: 'breastfeeding-basics',
                   title: 'Breastfeeding Basics',
-                  quick: 'Feed 8-12 times per day, let baby lead',
-                  details: 'Newborns feed frequently - every 2-3 hours. Look for hunger cues: rooting, sucking motions, fussiness. A good latch covers most of the areola, not just the nipple. Feed until baby naturally releases or falls asleep.'
+                  quick: 'Feed 8-12 times per day; let baby lead.',
+                  details: 'Newborns feed frequently, typically every 2-3 hours. Look for hunger cues: rooting, sucking motions, fussiness. A good latch covers most of the areola, not just the nipple. Feed until baby naturally releases or falls asleep.'
                 },
                 {
                   id: 'bottle-feeding',
                   title: 'Bottle Feeding',
-                  quick: '60-90ml every 2-4 hours initially',
-                  details: 'Start with small amounts (30-60ml) and increase gradually. Hold baby semi-upright, let them control the pace. Wind halfway through and after feeding. Sterilise equipment for first 12 months.'
+                  quick: '60-90ml every 2-4 hours initially.',
+                  details: 'Start with small amounts (30-60ml) and increase gradually. Hold baby semi-upright; let them control the pace. Wind halfway through and after feeding. Sterilise equipment for the first 12 months.'
                 },
                 {
                   id: 'mixed-feeding',
                   title: 'Combined Feeding',
-                  quick: 'Establish breastfeeding first, then introduce bottles',
-                  details: 'Wait 3-4 weeks before introducing bottles if breastfeeding. Use paced bottle feeding technique. Store expressed milk safely: room temperature 6 hours, fridge 5 days, freezer 6 months.'
+                  quick: 'Establish breastfeeding first, then introduce bottles.',
+                  details: 'Wait 3-4 weeks before introducing bottles if breastfeeding. Use a paced bottle feeding technique. Store expressed milk safely: room temperature 6 hours, fridge 5 days, freezer 6 months.'
                 },
                 {
                   id: 'feeding-cues',
                   title: 'Recognising Hunger & Fullness',
-                  quick: 'Early cues: rooting, sucking. Late: crying',
+                  quick: 'Early cues: rooting, sucking. Late: crying.',
                   details: 'Hunger signs: lip smacking, rooting, bringing hands to mouth, restlessness. Fullness signs: turning head away, pushing bottle away, relaxed hands, falling asleep.'
                 }
               ]
@@ -93,61 +100,63 @@
             nappies: {
               title: 'Nappy Changes',
               icon: '🔄',
-              color: 'bg-green-500',
+              baseColor: 'bg-green-500', // UK: colour
+              lightColor: 'bg-green-50',
               tips: [
                 {
                   id: 'changing-basics',
                   title: 'Safe Nappy Changing',
-                  quick: 'Change every 2-3 hours and after each poo',
-                  details: 'Always keep one hand on baby. Clean front to back with warm water or fragrance-free wipes. Let area air dry before new nappy. Apply barrier cream if needed.'
+                  quick: 'Change every 2-3 hours and after each poo.',
+                  details: 'Always keep one hand on baby. Clean front to back with warm water or fragrance-free wipes. Let the area air dry before applying a new nappy. Apply barrier cream if needed.'
                 },
                 {
                   id: 'nappy-contents',
                   title: 'What to Expect',
-                  quick: 'First poo (meconium) is dark, then changes colour',
+                  quick: 'First poo (meconium) is dark, then changes colour.', // UK: colour
                   details: 'Day 1-3: Dark green/black meconium. Day 4+: Yellow/mustard (breastfed) or pale yellow/brown (formula). Wet nappies: 1 on day 1, increasing to 6+ by day 6.'
                 },
                 {
                   id: 'nappy-rash',
                   title: 'Preventing Nappy Rash',
-                  quick: 'Change frequently, clean gently, air dry',
-                  details: 'Change wet/soiled nappies promptly. Use plain water for cleaning newborns. Pat dry, don\'t rub. Leave nappy off for short periods. Use barrier cream sparingly.'
+                  quick: 'Change frequently, clean gently, air dry.',
+                  details: 'Change wet/soiled nappies promptly. Use plain water for cleaning newborns. Pat dry; don\'t rub. Leave nappy off for short periods. Use barrier cream sparingly.'
                 },
                 {
                   id: 'supplies',
                   title: 'Essential Supplies',
-                  quick: 'Nappies, wipes, barrier cream, changing mat',
-                  details: 'Keep supplies within reach but away from baby. Have spare clothes ready. Use a waterproof changing mat. Keep nappy sacks or bin nearby.'
+                  quick: 'Nappies, wipes, barrier cream, changing mat.',
+                  details: 'Keep supplies within reach but away from baby. Have spare clothes ready. Use a waterproof changing mat. Keep nappy sacks or a bin nearby.'
                 }
               ]
             },
             sleep: {
               title: 'Sleep & Settling',
               icon: '🌙',
-              color: 'bg-purple-500',
+              baseColor: 'bg-purple-500', // UK: colour
+              lightColor: 'bg-purple-50',
               tips: [
                 {
                   id: 'safe-sleep',
                   title: 'Safe Sleep Guidelines',
-                  quick: 'Back to sleep, clear cot, room temperature 16-20°C',
-                  details: 'Always place baby on their back. Use a firm mattress with fitted sheets. No loose bedding, pillows, or toys. Baby should sleep in your room for first 6 months.'
+                  quick: 'Back to sleep, clear cot, room temperature 16-20°C.',
+                  details: 'Always place baby on their back. Use a firm mattress with fitted sheets. No loose bedding, pillows, or toys. Baby should sleep in your room for the first 6 months.'
                 },
                 {
                   id: 'sleep-patterns',
                   title: 'Newborn Sleep Patterns',
-                  quick: '14-17 hours total, in 2-4 hour stretches',
-                  details: 'Newborns sleep most of the day but wake frequently for feeds. Sleep cycles are shorter than adults. Day/night confusion is normal - establish routines gradually.'
+                  quick: '14-17 hours total, in 2-4 hour stretches.',
+                  details: 'Newborns sleep most of the day but wake frequently for feeds. Sleep cycles are shorter than adults\'. Day/night confusion is normal; establish routines gradually.'
                 },
                 {
                   id: 'settling-techniques',
                   title: 'Settling Your Baby',
-                  quick: 'Swaddle, shush, swing, suck, side position',
-                  details: 'Try the 5 S\'s: Swaddle snugly, Shush loudly, Swing gently, offer Suck (dummy/finger), hold on Side. Not all work for every baby - find what works for yours.'
+                  quick: 'Swaddle, shush, swing, suck, side position.',
+                  details: 'Try the 5 S’s: Swaddle snugly, Shush loudly, Swing gently, offer Suck (dummy/finger), hold on Side. Not all work for every baby; find what works for yours.'
                 },
                 {
                   id: 'partner-support',
                   title: 'Taking Turns',
-                  quick: 'Share night duties, plan sleep shifts',
+                  quick: 'Share night duties; plan sleep shifts.',
                   details: 'Take turns with night feeds. If breastfeeding, partner can do nappy changes and settling. Consider expressing milk for night feeds. Rest when baby rests during the day.'
                 }
               ]
@@ -155,128 +164,302 @@
             health: {
               title: 'Health & Development',
               icon: '❤️',
-              color: 'bg-red-500',
+              baseColor: 'bg-red-500', // UK: colour
+              lightColor: 'bg-red-50',
               tips: [
                 {
                   id: 'weight-growth',
                   title: 'Weight & Growth',
-                  quick: 'Weight loss up to 10% normal, should regain by day 10',
-                  details: 'Most babies lose 5-10% of birth weight in first few days. Should regain birth weight by 10-14 days. Regular weighing not needed unless concerns. Growth spurts common at 2-3 weeks, 6 weeks, 3 months.'
+                  quick: 'Weight loss up to 10% normal; should regain by day 10.',
+                  details: 'Most babies lose 5-10% of birth weight in the first few days. Should regain birth weight by 10-14 days. Regular weighing is not needed unless there are concerns. Growth spurts are common at 2-3 weeks, 6 weeks, and 3 months.'
                 },
                 {
                   id: 'umbilical-care',
                   title: 'Umbilical Cord Care',
-                  quick: 'Keep clean and dry, falls off in 1-3 weeks',
-                  details: 'Clean with plain water if soiled. Keep dry and exposed to air. Fold nappy below cord. Normal for small amount of blood when it falls off. See GP if red, swollen, or smelly.'
+                  quick: 'Keep clean and dry; falls off in 1-3 weeks.',
+                  details: 'Clean with plain water if soiled. Keep dry and exposed to air. Fold nappy below cord. It is normal for a small amount of blood when it falls off. See your GP if it is red, swollen, or smelly.'
                 },
                 {
                   id: 'jaundice',
                   title: 'Newborn Jaundice',
-                  quick: 'Common after day 2, monitor yellow colouring',
-                  details: 'Affects over half of newborns. Usually appears day 2-3, peaks day 4-5. Check in natural light - press skin gently, look for yellow tinge. Contact midwife if concerned or if yellowing spreads.'
+                  quick: 'Common after day 2; monitor yellow colouring.', // UK: colouring
+                  details: 'Affects over half of newborns. Usually appears day 2-3, peaks day 4-5. Check in natural light: press skin gently, look for a yellow tinge. Contact your midwife if concerned or if yellowing spreads.'
                 },
                 {
                   id: 'when-to-worry',
                   title: 'When to Seek Help',
-                  quick: 'Difficulty breathing, poor feeding, unusual behaviour',
-                  details: 'Contact healthcare immediately for: difficulty breathing, blue lips/tongue, very hot/cold, unusually floppy, persistent vomiting, fewer than 6 wet nappies after day 5, seems unwell.'
+                  quick: 'Difficulty breathing, poor feeding, unusual behaviour.',
+                  details: 'Contact healthcare immediately for: difficulty breathing, blue lips/tongue, very hot/cold, unusually floppy, persistent vomiting, fewer than 6 wet nappies after day 5, or if baby seems unwell.'
                 }
               ]
             },
             partners: {
               title: 'Partner Support',
               icon: '👥',
-              color: 'bg-orange-500',
+              baseColor: 'bg-orange-500', // UK: colour
+              lightColor: 'bg-orange-50',
               tips: [
                 {
                   id: 'sharing-duties',
                   title: 'Sharing Care Duties',
-                  quick: 'Divide tasks, support each other, communicate needs',
-                  details: 'Non-breastfeeding partner: nappy changes, baths, settling, housework. Take turns with night duties. Communicate openly about needs and feelings. Both parents learn all care tasks.'
+                  quick: 'Divide tasks, support each other, communicate needs.',
+                  details: 'Non-breastfeeding partner: nappy changes, baths, settling, housework. Take turns with night duties. Communicate openly about needs and feelings. Both parents should learn all care tasks.'
                 },
                 {
                   id: 'supporting-breastfeeding',
                   title: 'Supporting Breastfeeding',
-                  quick: 'Bring baby for feeds, help with positioning, emotional support',
+                  quick: 'Bring baby for feeds, help with positioning, emotional support.',
                   details: 'Fetch baby for night feeds, help with positioning/latching, bring snacks and water, take over after feeds for winding and settling. Offer encouragement and practical support.'
                 },
                 {
                   id: 'rest-recovery',
                   title: 'Rest & Recovery',
-                  quick: 'Sleep when baby sleeps, accept help, rest in shifts',
-                  details: 'Both parents need rest. Sleep when baby sleeps during day. Take turns for longer sleep stretches at night. Accept help from family/friends. Limit visitors initially.'
+                  quick: 'Sleep when baby sleeps, accept help, rest in shifts.',
+                  details: 'Both parents need rest. Sleep when baby sleeps during the day. Take turns for longer sleep stretches at night. Accept help from family/friends. Limit visitors initially.'
                 },
                 {
                   id: 'emotional-support',
                   title: 'Emotional Wellbeing',
-                  quick: 'Talk openly, seek support, be patient with yourselves',
-                  details: 'Baby blues are normal in first 2 weeks. Talk about your feelings. Seek help if sadness persists or affects daily life. Be patient - you\'re both learning. Celebrate small victories.'
+                  quick: 'Talk openly, seek support, be patient with yourselves.',
+                  details: 'Baby blues are normal in the first 2 weeks. Talk about your feelings. Seek help if sadness persists or affects daily life. Be patient; you\'re both learning. Celebrate small victories.'
                 }
               ]
             },
             routine: {
               title: 'Daily Routine',
               icon: '🕐',
-              color: 'bg-teal-500',
+              baseColor: 'bg-teal-500', // UK: colour
+              lightColor: 'bg-teal-50',
               tips: [
                 {
                   id: 'flexible-routine',
                   title: 'Building a Flexible Routine',
-                  quick: 'Follow baby\'s natural patterns, establish gentle rhythms',
+                  quick: 'Follow baby\'s natural patterns; establish gentle rhythms.',
                   details: 'Newborns don\'t follow strict schedules. Watch for baby\'s natural patterns. Create gentle rhythms: feed, awake time, sleep. Routines develop gradually over weeks and months.'
                 },
                 {
                   id: 'daily-care',
                   title: 'Daily Care Tasks',
-                  quick: 'Feeds, nappy changes, brief awake periods, lots of sleep',
-                  details: 'Typical day: 8-12 feeds, 8-10 nappy changes, short awake periods after feeds, 14-17 hours sleep total. Don\'t expect predictability in first weeks.'
+                  quick: 'Feeds, nappy changes, brief awake periods, lots of sleep.',
+                  details: 'Typical day: 8-12 feeds, 8-10 nappy changes, short awake periods after feeds, 14-17 hours sleep total. Don\'t expect predictability in the first weeks.'
                 },
                 {
                   id: 'bath-time',
                   title: 'Bathing Your Baby',
-                  quick: '2-3 times per week, 37°C water, 5-10 minutes',
-                  details: 'Daily baths not needed. Use baby bath or clean basin. Water depth 5cm, temperature 37°C. Support head and neck. Wash face first, hair last. Have towel ready.'
+                  quick: '2-3 times per week, 37°C water, 5-10 minutes.',
+                  details: 'Daily baths are not needed. Use a baby bath or clean basin. Water depth 5cm, temperature 37°C. Support head and neck. Wash face first, hair last. Have a towel ready.'
                 },
                 {
                   id: 'awake-time',
                   title: 'Awake & Alert Time',
-                  quick: 'Short periods initially, increase gradually',
-                  details: 'Newborns have very short awake periods - often just for feeds initially. Gradually increases to 45-60 minutes by 2 months. Use for gentle interaction, tummy time (when awake and supervised).'
+                  quick: 'Short periods initially; increase gradually.',
+                  details: 'Newborns have very short awake periods, often just for feeds initially. This gradually increases to 45-60 minutes by 2 months. Use for gentle interaction and tummy time (when awake and supervised).'
                 }
               ]
             }
           };
 
+          // Effect to update background when activeSection changes
+          useEffect(() => {
+            if (activeSection && sectionDetails[activeSection]) {
+              setPageBackground(sectionDetails[activeSection].lightColor);
+            } else {
+              setPageBackground('bg-gradient-to-br from-slate-50 to-gray-100'); // Default if no section or section not found
+            }
+          }, [activeSection]);
+
+          // Effect to set greeting on component mount
+          useEffect(() => {
+            const getCurrentGreeting = () => {
+              const hour = new Date().getHours();
+              const day = new Date().getDay(); // 0 for Sunday, 1 for Monday, etc.
+
+              if (hour < 5) return "Up late or up early? We're here for you during these quiet hours.";
+              if (hour < 12) return "Good morning! Ready for a brand new day with your little one?";
+              if (hour < 17) return "Good afternoon! Hope you're having a lovely day.";
+              if (hour < 21) return "Good evening! Time to wind down with your precious baby.";
+              return "It's late... hope you and baby are resting. We're here if you need a tip!";
+            };
+            setGreeting(getCurrentGreeting());
+          }, []); // Empty dependency array means this runs once on mount
+
+          // Effect to fetch weather data
+          useEffect(() => {
+            const fetchWeather = async (latitude, longitude) => {
+              setWeatherLoading(true);
+              setWeatherError(null);
+              try {
+                // Open-Meteo API for current weather including temperature and a WMO weather code
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&temperature_unit=celsius&windspeed_unit=kmh&timeformat=iso8601&timezone=auto`);
+                if (!response.ok) {
+                  throw new Error(`Weather API request failed with status ${response.status}`);
+                }
+                const data = await response.json();
+                if (data && data.current_weather) {
+                  setWeather({
+                    temp: data.current_weather.temperature,
+                    code: data.current_weather.weathercode, // WMO Weather interpretation codes
+                    windSpeed: data.current_weather.windspeed,
+                  });
+                } else {
+                  throw new Error("Weather data format incorrect");
+                }
+              } catch (error) {
+                console.error("Failed to fetch weather:", error);
+                setWeatherError(error.message);
+              } finally {
+                setWeatherLoading(false);
+              }
+            };
+
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  fetchWeather(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                  console.error("Error getting location:", error);
+                  setWeatherError("Unable to retrieve location. Please enable location services.");
+                  setWeatherLoading(false);
+                }
+              );
+            } else {
+              setWeatherError("Geolocation is not supported by this browser.");
+              setWeatherLoading(false);
+            }
+          }, []); // Runs once on mount
+
+          const handleSectionClick = (sectionKey) => {
+            setActiveSection(sectionKey);
+            // setShowEmergency(false); // Optionally close emergency when changing sections
+          };
+
+          const getWeatherTips = () => {
+            if (!weather) return { house: null, clothing: null, icon: '❓' };
+
+            const { temp, code } = weather;
+            let houseTip = "";
+            let clothingTip = "";
+            let weatherIcon = "☀️"; // Default sunny
+
+            // WMO Weather interpretation codes mapping (simplified)
+            if (code === 0) { weatherIcon = "☀️"; clothingTip = "Enjoy the clear skies! Standard layers for baby."; } // Clear sky
+            else if (code >= 1 && code <= 3) { weatherIcon = "🌤️"; clothingTip = "Mainly clear to partly cloudy. Standard layers, perhaps a light hat if breezy."; } // Partly cloudy
+            else if (code === 45 || code === 48) { weatherIcon = "🌫️"; clothingTip = "Foggy! If going out, ensure baby is visible and warm."; } // Fog
+            else if (code >= 51 && code <= 55) { weatherIcon = "🌦️"; clothingTip = "Light drizzle. A waterproof outer layer or pram cover if outside."; } // Drizzle
+            else if (code >= 56 && code <= 57) { weatherIcon = "🥶"; clothingTip = "Freezing drizzle. Best to stay indoors if possible."; } // Freezing Drizzle
+            else if (code >= 61 && code <= 65) { weatherIcon = "🌧️"; clothingTip = "Rainy day. Waterproofs essential if you must go out."; } // Rain
+            else if (code >= 66 && code <= 67) { weatherIcon = "🥶"; clothingTip = "Freezing rain. Stay warm and dry indoors."; } // Freezing Rain
+            else if (code >= 71 && code <= 75) { weatherIcon = "❄️"; clothingTip = "Snowfall! Bundle up baby well if venturing out for a short while."; } // Snow fall
+            else if (code === 77) { weatherIcon = "❄️"; clothingTip = "Snow grains. Keep baby warm.";} // Snow grains
+            else if (code >= 80 && code <= 82) { weatherIcon = "🌧️"; clothingTip = "Rain showers. Be prepared for sudden rain."; } // Rain showers
+            else if (code >= 85 && code <= 86) { weatherIcon = "❄️"; clothingTip = "Snow showers. Keep baby warm and dry."; } // Snow showers
+            else if (code >= 95 && code <= 99) { weatherIcon = "⛈️"; clothingTip = "Thunderstorm! Safest to stay indoors."; } // Thunderstorm
+
+            if (temp < 16) {
+              houseTip = `It's cool (${temp}°C). Ensure room temperature is 18-20°C. Baby may need an extra layer.`;
+              if (!clothingTip.includes("warm") && !clothingTip.includes("layer")) clothingTip += " Baby will need warm layers.";
+            } else if (temp >= 16 && temp <= 20) {
+              houseTip = `Pleasant temperature (${temp}°C). Keep room comfortable (18-20°C).`;
+              if (!clothingTip) clothingTip = "Standard indoor clothing for baby is fine.";
+            } else if (temp > 20 && temp <= 24) {
+              houseTip = `It's mild (${temp}°C). Ensure baby doesn't overheat. Good ventilation is key.`;
+              clothingTip += " Light layers for baby. Check for signs of overheating.";
+            } else { // temp > 24
+              houseTip = `Warm (${temp}°C)! Keep baby cool. Use light bedding and ensure good air circulation. Avoid direct sun.`;
+              clothingTip += " Very light clothing, or just a nappy if very hot indoors. Stay hydrated (if breastfeeding, mum stays hydrated; formula as usual).";
+            }
+
+            return { house: houseTip, clothing: clothingTip, icon: weatherIcon, temp: temp };
+          };
+
+
           return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className={`min-h-screen transition-colors duration-500 ease-in-out ${pageBackground}`}>
               <div className="max-w-4xl mx-auto p-4">
                 {/* Header */}
-                <div className="text-center mb-8 bg-white rounded-xl shadow-lg p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <span className="text-3xl mr-3">👶</span>
-                    <h1 className="text-3xl font-bold text-gray-800">NHS Newborn Care Guide</h1>
+                <div className="mb-8 bg-white rounded-xl shadow-lg p-6">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-4">
+                      <span className="text-3xl mr-3">👶</span>
+                      <h1 className="text-3xl font-bold text-gray-800">First Days</h1>
+                    </div>
+                    <p className="text-gray-600 text-lg mb-2">Essential care information for your baby's first weeks.</p>
+                    {greeting && <p className="text-sm text-indigo-600 italic mb-4">{greeting}</p>}
                   </div>
-                  <p className="text-gray-600 text-lg">Essential care information for your baby's first weeks</p>
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                    <div className="flex items-center">
-                      <span className="text-lg mr-2">⚠️</span>
-                      <p className="text-sm text-blue-800">
-                        <strong>Emergency:</strong> Call 999 or go to A&E if your baby has difficulty breathing, won't wake up, or you're very worried
+
+                  {/* Weather Section */}
+                  <div className="my-4 p-3 bg-sky-50 rounded-lg border-l-4 border-sky-500">
+                    <h3 className="text-md font-semibold text-sky-800 mb-1">Today's Outlook & Baby Tips</h3>
+                    {weatherLoading && <p className="text-sm text-sky-700">Fetching weather tips...</p>}
+                    {weatherError && <p className="text-sm text-red-600">{weatherError}</p>}
+                    {weather && !weatherLoading && !weatherError && (() => {
+                      const tips = getWeatherTips();
+                      return (
+                        <div>
+                          <p className="text-2xl text-sky-700 mb-1">
+                            {tips.icon} {tips.temp}°C
+                          </p>
+                          {tips.house && <p className="text-sm text-sky-700 mb-1"><strong>House:</strong> {tips.house}</p>}
+                          {tips.clothing && <p className="text-sm text-sky-700"><strong>Baby Wear:</strong> {tips.clothing}</p>}
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Emergency Button */}
+                  <button
+                    onClick={() => setShowEmergency(!showEmergency)}
+                    className="w-full flex items-center justify-center px-4 py-3 mb-4 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-colors font-semibold"
+                  >
+                    <span className="text-xl mr-2">⚠️</span>
+                    EMERGENCY INFORMATION
+                    <span className="text-xl ml-2">{showEmergency ? '⌄' : '›'}</span>
+                  </button>
+
+                  {/* Collapsible Emergency Section */}
+                  {showEmergency && (
+                    <div className="mt-4 p-4 bg-red-50 rounded-lg border-l-4 border-red-500 text-left">
+                      <h3 className="text-lg font-bold text-red-800 mb-2">When to Call 999 or Go to A&E</h3>
+                      <p className="text-sm text-red-700 mb-3">
+                        If your baby has difficulty breathing, won't wake up, has a fit (seizure) for the first time, or you're very worried, call 999 or go to your nearest A&E department.
+                      </p>
+
+                      <h3 className="text-lg font-bold text-red-800 mb-2">Choking Baby (1 year and under) - Based on Red Cross Guidelines</h3>
+                      <p className="text-xs text-gray-600 mb-2">Signs: Baby can't cry, make noise, cough, or breathe.</p>
+                      <ol className="list-decimal list-inside text-sm text-red-700 space-y-2">
+                        <li>
+                          <strong>Give up to 5 back blows:</strong> Hold the baby face-down along your thigh with their head lower than their bottom. Hit them firmly on their back between the shoulder blades up to five times. If back blows do not dislodge the blockage, move on to step 2.
+                          <p className="text-xs text-gray-500 mt-1">Support their head. Back blows create a strong vibration and pressure in the airway.</p>
+                        </li>
+                        <li>
+                          <strong>Give up to 5 chest thrusts:</strong> If they are still choking, turn the baby over so they are facing upwards. Place two fingers in the middle of their chest just below the nipples. Push sharply downwards up to five times.
+                           <p className="text-xs text-gray-500 mt-1">Chest thrusts squeeze air out of the baby’s lungs and may dislodge the blockage.</p>
+                        </li>
+                        <li>
+                          <strong>Call 999 if still choking:</strong> Repeat the steps (5 back blows, 5 chest thrusts) until they can breathe again or help arrives.
+                        </li>
+                      </ol>
+                      <p className="text-xs text-gray-600 mt-3">
+                        Important: Do not do abdominal thrusts (Heimlich manoeuvre) on a baby. Do not put your fingers into their mouth if you cannot see an object, as you risk pushing it further. If you can clearly see an object and can pluck it out safely, you may do so.
+                      </p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        This first aid information is based on Red Cross guidelines. For non-urgent concerns, call NHS 111.
                       </p>
                     </div>
-                  </div>
+                  )}
                 </div>
                 
                 {/* Navigation */}
                 <div className="mb-6">
                   <div className="flex flex-wrap gap-2 justify-center">
-                    {Object.entries(sections).map(([key, section]) => (
+                    {Object.entries(sectionDetails).map(([key, section]) => (
                       <button
                         key={key}
-                        onClick={() => setActiveSection(key)}
+                        onClick={() => handleSectionClick(key)}
                         className={`flex items-center px-4 py-2 rounded-lg transition-all ${
                           activeSection === key
-                            ? `${section.color} text-white shadow-lg`
+                            ? `${section.baseColor} text-white shadow-lg`
                             : 'bg-white text-gray-700 hover:bg-gray-50'
                         }`}
                       >
@@ -290,12 +473,12 @@
                 {/* Content */}
                 <div className="bg-white rounded-xl shadow-lg p-6">
                   <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                    <span className="text-2xl mr-3">{sections[activeSection].icon}</span>
-                    <span>{sections[activeSection].title}</span>
+                    <span className="text-2xl mr-3">{sectionDetails[activeSection].icon}</span>
+                    <span>{sectionDetails[activeSection].title}</span>
                   </h2>
 
                   <div className="space-y-4">
-                    {sections[activeSection].tips.map((tip) => (
+                    {sectionDetails[activeSection].tips.map((tip) => (
                       <div key={tip.id} className="border border-gray-200 rounded-lg overflow-hidden">
                         <button
                           onClick={() => toggleTip(tip.id)}
@@ -329,7 +512,7 @@
                       This information is based on NHS guidelines. Always consult your midwife, health visitor, or GP for personalised advice.
                     </p>
                     <p className="text-xs text-gray-500 mt-2">
-                      For urgent concerns outside surgery hours, call NHS 111
+                      For urgent concerns outside surgery hours, call NHS 111.
                     </p>
                   </div>
                 </div>
