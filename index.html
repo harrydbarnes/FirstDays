@@ -45,7 +45,52 @@
     <div id="root"></div>
     
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, Component } = React;
+
+        // ErrorBoundary Component
+        class ErrorBoundary extends Component {
+          constructor(props) {
+            super(props);
+            this.state = { hasError: false, error: null, errorInfo: null };
+          }
+
+          static getDerivedStateFromError(error) {
+            // Update state so the next render will show the fallback UI.
+            return { hasError: true };
+          }
+
+          componentDidCatch(error, errorInfo) {
+            // You can also log the error to an error reporting service
+            console.error("Uncaught error:", error, errorInfo);
+            this.setState({ error: error, errorInfo: errorInfo });
+          }
+
+          render() {
+            if (this.state.hasError) {
+              // You can render any custom fallback UI
+              return (
+                <div className="p-4">
+                  <h1 className="text-2xl font-bold text-red-600 mb-2">Something went wrong.</h1>
+                  <p className="text-gray-700 mb-2">
+                    We're sorry, but the application encountered an error and couldn't load.
+                    Please try refreshing the page. If the problem persists, please contact support.
+                  </p>
+                  {this.state.error && (
+                    <details className="mt-2 text-sm text-gray-600">
+                      <summary>Error Details (for technical users)</summary>
+                      <pre className="mt-1 p-2 bg-gray-100 rounded text-xs whitespace-pre-wrap">
+                        {this.state.error.toString()}
+                        {this.state.errorInfo && this.state.errorInfo.componentStack}
+                      </pre>
+                    </details>
+                  )}
+                </div>
+              );
+            }
+
+            return this.props.children;
+          }
+        }
 
         const NewbornCareApp = () => {
           const [activeSection, setActiveSection] = useState('feeding');
@@ -326,12 +371,28 @@
                 },
                 (error) => {
                   console.error("Error getting location:", error);
-                  setWeatherError("Unable to retrieve location. Please enable location services.");
+                  let errorMessage = "Unable to retrieve location. Weather tips may be unavailable.";
+                  switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                      errorMessage = "Location permission denied. Please enable location services in your browser settings to see weather tips.";
+                      break;
+                    case error.POSITION_UNAVAILABLE:
+                      errorMessage = "Location information is unavailable at the moment. Please try again later.";
+                      break;
+                    case error.TIMEOUT:
+                      errorMessage = "Request for user location timed out. Please try again.";
+                      break;
+                    default:
+                      errorMessage = "An unknown error occurred while trying to get your location.";
+                      break;
+                  }
+                  setWeatherError(errorMessage);
                   setWeatherLoading(false);
-                }
+                },
+                { timeout: 10000 } // Add a timeout for geolocation request
               );
             } else {
-              setWeatherError("Geolocation is not supported by this browser.");
+              setWeatherError("Geolocation is not supported by this browser. Weather tips will be unavailable.");
               setWeatherLoading(false);
             }
           }, []); // Runs once on mount
@@ -535,7 +596,12 @@
           );
         };
 
-        ReactDOM.render(<NewbornCareApp />, document.getElementById('root'));
+        ReactDOM.render(
+          <ErrorBoundary>
+            <NewbornCareApp />
+          </ErrorBoundary>,
+          document.getElementById('root')
+        );
     </script>
 </body>
 </html>
